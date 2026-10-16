@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop API - UI/UX Prototype (API-First Mock Server)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(99, 102, 241, 0.4);
+      --accent-primary: #6366f1;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --code-bg: #030712;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Header */
+    header {
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: var(--accent-gradient);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .server-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-success);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    /* Nav Tabs */
+    .tabs-header {
+      display: flex;
+      gap: 8px;
+      background: rgba(17, 24, 39, 0.6);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: white;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .method-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .method-get { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .method-post { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .method-patch { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Response Console */
+    .console-pane {
+      position: sticky;
+      top: 96px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 120px);
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 14px;
+    }
+
+    .console-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .request-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      margin-bottom: 12px;
+      background: rgba(3, 7, 18, 0.4);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .status-code-badge {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .status-2xx { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-4xx { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    .code-viewer {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #38bdf8;
+      overflow: auto;
+      flex: 1;
+      white-space: pre-wrap;
+    }
+
+    /* Tabs Content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">API-FIRST</div>
+      <div>
+        <div class="brand-title">Shop API Prototype Explorer</div>
+        <div class="brand-subtitle">Thử nghiệm luồng Mock Server theo kịch bản OpenAPI 3.0</div>
+      </div>
+    </div>
+    <div class="server-status" id="serverStatusBadge">
+      <span class="status-dot"></span>
+      <span>Mock Server: http://127.0.0.1:4010</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <!-- Left Interaction Column -->
+    <div>
+      <!-- Nav Tabs -->
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tabBtnCustomers" onclick="switchTab('customers')">
+          👤 Khách hàng (/customers)
+        </button>
+        <button class="tab-btn" id="tabBtnProducts" onclick="switchTab('products')">
+          📦 Sản phẩm (/products)
+        </button>
+        <button class="tab-btn" id="tabBtnOrders" onclick="switchTab('orders')">
+          🛒 Đơn hàng (/orders)
+        </button>
+      </div>
+
+      <!-- CUSTOMERS TAB -->
+      <div id="tabCustomers" class="tab-content active">
+        <!-- List Customers -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-get">GET</span>
+            <span>Danh sách khách hàng (phân trang & sắp xếp)</span>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Page (bắt đầu từ 0)</label>
+              <input type="number" id="custPage" class="form-input" value="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Size (tối đa 100)</label>
+              <input type="number" id="custSize" class="form-input" value="10" min="1" max="100">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnListCustomers" onclick="fetchCustomers()">
+            Gửi Yêu Cầu (GET /customers)
+          </button>
+        </div>
+
+        <!-- Create Customer -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-post">POST</span>
+            <span>Tạo mới khách hàng (BR-01, BR-02)</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Họ tên (2–100 ký tự)</label>
+            <input type="text" id="custName" class="form-input" value="Nguyễn Văn An">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Email (Duy nhất)</label>
+              <input type="email" id="custEmail" class="form-input" value="an.nguyen@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số điện thoại</label>
+              <input type="text" id="custPhone" class="form-input" value="0901234567">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Địa chỉ</label>
+            <input type="text" id="custAddress" class="form-input" value="123 Lê Lợi, Quận 1, TP.HCM">
+          </div>
+          <button class="btn btn-primary" id="btnCreateCustomer" onclick="createCustomer()">
+            Tạo Khách Hàng (POST /customers)
+          </button>
+        </div>
+      </div>
+
+      <!-- PRODUCTS TAB -->
+      <div id="tabProducts" class="tab-content">
+        <!-- List Products -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-get">GET</span>
+            <span>Danh sách sản phẩm (US-02 Sắp xếp theo giá)</span>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Sắp xếp (sort)</label>
+              <select id="prodSort" class="form-input">
+                <option value="price,desc">Giá giảm dần (price,desc)</option>
+                <option value="price,asc">Giá tăng dần (price,asc)</option>
+                <option value="createdAt,desc">Mới nhất (createdAt,desc)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số lượng mỗi trang (size)</label>
+              <input type="number" id="prodSize" class="form-input" value="10">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnListProducts" onclick="fetchProducts()">
+            Gửi Yêu Cầu (GET /products)
+          </button>
+        </div>
+
+        <!-- Create Product -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-post">POST</span>
+            <span>Thêm sản phẩm mới (BR-04)</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên sản phẩm</label>
+            <input type="text" id="prodName" class="form-input" value="Bàn phím cơ Không dây Pro">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Giá bán (VNĐ / USD)</label>
+              <input type="number" id="prodPrice" class="form-input" value="1500000" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tồn kho ban đầu (stock ≥ 0)</label>
+              <input type="number" id="prodStock" class="form-input" value="50" min="0">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnCreateProduct" onclick="createProduct()">
+            Thêm Sản Phẩm (POST /products)
+          </button>
+        </div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div id="tabOrders" class="tab-content">
+        <!-- Create Order -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-post">POST</span>
+            <span>Đặt hàng (Tự tính tổng tiền, trừ tồn - BR-05..BR-09)</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Customer ID</label>
+            <input type="number" id="orderCustId" class="form-input" value="1">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Product ID</label>
+              <input type="number" id="orderProdId" class="form-input" value="101">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số lượng mua</label>
+              <input type="number" id="orderQty" class="form-input" value="2" min="1">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnCreateOrder" onclick="createOrder()">
+            Đặt Hàng (POST /orders)
+          </button>
+        </div>
+
+        <!-- Update Order Status -->
+        <div class="card">
+          <div class="card-title">
+            <span class="method-badge method-patch">PATCH</span>
+            <span>Cập nhật trạng thái đơn hàng (BR-10, BR-11)</span>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Mã đơn hàng (Order ID)</label>
+              <input type="number" id="statusOrderId" class="form-input" value="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Trạng thái mới</label>
+              <select id="newStatus" class="form-input">
+                <option value="PAID">PAID (Đã thanh toán)</option>
+                <option value="CANCELLED">CANCELLED (Hủy & hoàn tồn)</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-secondary" id="btnUpdateOrderStatus" onclick="updateOrderStatus()">
+            Chuyển Trạng Thái (PATCH /orders/{id}/status)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Console / Response Inspector -->
+    <div>
+      <div class="card console-pane">
+        <div class="console-header">
+          <div class="console-title">
+            <span>⚡ API Response Inspector</span>
+          </div>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="clearConsole()">
+            Xóa
+          </button>
+        </div>
+        <div class="request-meta" id="reqMeta">
+          <span class="status-code-badge status-2xx" id="respBadge">READY</span>
+          <span id="reqUrl">Sẵn sàng gửi request đến Mock Server...</span>
+        </div>
+        <pre class="code-viewer" id="jsonResponse">// Nhấn bất kỳ nút gửi yêu cầu ở cột bên trái
+// Phản hồi JSON giả lập chuẩn OpenAPI 3.0 sẽ xuất hiện tại đây.</pre>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const MOCK_BASE = 'http://127.0.0.1:4010';
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (tab === 'customers') {
+        document.getElementById('tabBtnCustomers').classList.add('active');
+        document.getElementById('tabCustomers').classList.add('active');
+      } else if (tab === 'products') {
+        document.getElementById('tabBtnProducts').classList.add('active');
+        document.getElementById('tabProducts').classList.add('active');
+      } else if (tab === 'orders') {
+        document.getElementById('tabBtnOrders').classList.add('active');
+        document.getElementById('tabOrders').classList.add('active');
+      }
+    }
+
+    async function sendRequest(url, options = {}) {
+      const startTime = performance.now();
+      const metaEl = document.getElementById('reqMeta');
+      const badgeEl = document.getElementById('respBadge');
+      const urlEl = document.getElementById('reqUrl');
+      const jsonEl = document.getElementById('jsonResponse');
+
+      const method = options.method || 'GET';
+      urlEl.innerText = `${method} ${url}`;
+      badgeEl.innerText = 'CALLING...';
+      badgeEl.className = 'status-code-badge';
+
+      try {
+        const res = await fetch(url, options);
+        const elapsed = Math.round(performance.now() - startTime);
+        const data = await res.json().catch(() => ({ message: 'Không có JSON' }));
+
+        badgeEl.innerText = `${res.status} ${res.statusText} (${elapsed}ms)`;
+        if (res.ok) {
+          badgeEl.className = 'status-code-badge status-2xx';
+        } else {
+          badgeEl.className = 'status-code-badge status-4xx';
+        }
+
+        // Print header Location if any
+        let headerNote = '';
+        if (res.headers.get('Location')) {
+          headerNote = `// Header Location: ${res.headers.get('Location')}\n\n`;
+        }
+
+        jsonEl.innerText = headerNote + JSON.stringify(data, null, 2);
+      } catch (err) {
+        badgeEl.innerText = 'ERROR';
+        badgeEl.className = 'status-code-badge status-4xx';
+        jsonEl.innerText = `Lỗi kết nối tới Mock Server:\n${err.message}\n\nHãy đảm bảo Prism Mock Server đang chạy tại ${MOCK_BASE}`;
+      }
+    }
+
+    // Customers APIs
+    function fetchCustomers() {
+      const page = document.getElementById('custPage').value || 0;
+      const size = document.getElementById('custSize').value || 10;
+      sendRequest(`${MOCK_BASE}/customers?page=${page}&size=${size}`);
+    }
+
+    function createCustomer() {
+      const body = {
+        name: document.getElementById('custName').value,
+        email: document.getElementById('custEmail').value,
+        phone: document.getElementById('custPhone').value,
+        address: document.getElementById('custAddress').value
+      };
+      sendRequest(`${MOCK_BASE}/customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+
+    // Products APIs
+    function fetchProducts() {
+      const sort = document.getElementById('prodSort').value;
+      const size = document.getElementById('prodSize').value || 10;
+      sendRequest(`${MOCK_BASE}/products?size=${size}&sort=${sort}`);
+    }
+
+    function createProduct() {
+      const body = {
+        name: document.getElementById('prodName').value,
+        price: parseFloat(document.getElementById('prodPrice').value),
+        stock: parseInt(document.getElementById('prodStock').value),
+        description: 'Sản phẩm tạo từ UI/UX Prototype'
+      };
+      sendRequest(`${MOCK_BASE}/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+
+    // Orders APIs
+    function createOrder() {
+      const custId = parseInt(document.getElementById('orderCustId').value);
+      const prodId = parseInt(document.getElementById('orderProdId').value);
+      const qty = parseInt(document.getElementById('orderQty').value);
+
+      const body = {
+        customerId: custId,
+        items: [{ productId: prodId, quantity: qty }]
+      };
+      sendRequest(`${MOCK_BASE}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+
+    function updateOrderStatus() {
+      const orderId = document.getElementById('statusOrderId').value;
+      const status = document.getElementById('newStatus').value;
+      sendRequest(`${MOCK_BASE}/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    }
+
+    function clearConsole() {
+      document.getElementById('reqUrl').innerText = 'Console đã xóa';
+      document.getElementById('respBadge').innerText = 'READY';
+      document.getElementById('respBadge').className = 'status-code-badge status-2xx';
+      document.getElementById('jsonResponse').innerText = '// Đã xóa kết quả phản hồi';
+    }
+  </script>
+</body>
+</html>
