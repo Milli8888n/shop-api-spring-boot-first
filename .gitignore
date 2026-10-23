@@ -15,6 +15,6 @@ target/
 *.log
 node_modules/
 
-### OS ###
-Thumbs.db
-.DS_Store
+### Standalone Sub-repos ###
+shop-ecommerce-fullstack/
+
